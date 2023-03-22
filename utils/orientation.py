@@ -89,7 +89,7 @@ def nms(dets, scores, thresh):
     return np.array(keep)
 
 
-def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=None, agnostic=False, multi_label=False,
+def non_max_suppression(prediction, conf_thres=0.5, iou_thres=0.55, classes=None, agnostic=False, multi_label=False,
                         labels=()):
     """Runs Non-Maximum Suppression (NMS) on inference results
 
