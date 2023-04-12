@@ -1,6 +1,7 @@
 from flask import Flask, Response
 import cv2
 import time
+import paramiko
 
 from utils.process import detect
 
@@ -9,7 +10,7 @@ app = Flask(__name__)
 
 def generate_frames(sava_video=False):
     cap = cv2.VideoCapture(0)
-    save_path, recording, out, start_time, fourcc, fps, width, height = None, None, None, None, None, None, None, None
+    sftp, ssh, out_filename, save_path, recording, out, start_time, fourcc, fps, width, height = None, None, None, None, None, None, None, None, None, None, None
 
     if sava_video:
         # 初始化需要的参数
@@ -23,6 +24,14 @@ def generate_frames(sava_video=False):
         out_filename = 'output_{}.mp4v'.format(time.strftime('%Y%m%d_%H%M%S'))
 
         out = cv2.VideoWriter(save_path + out_filename, fourcc, 10, (width, height))
+
+        # 建立SFTP连接
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect("150.158.88.159", username="ubuntu", password="5921wjy!")
+
+        # 创建SFTP客户端
+        sftp = ssh.open_sftp()
 
     while True:
         # 逐帧捕获视频
@@ -43,6 +52,14 @@ def generate_frames(sava_video=False):
                 recording = False
                 out.release()
                 print("结束录制")
+
+                # 像服务器发送请求
+                sftp.put(save_path + out_filename, "/var/www/html/videos/" + out_filename)
+                # 关闭SFTP连接和SSH会话
+                sftp.close()
+                ssh.close()
+
+                print(f"The file {out_filename} has been saved to /var/www/html/videos/")
 
                 # 重新新建一个视频存储对象
                 out_filename = 'output_{}.mp4v'.format(time.strftime('%Y%m%d_%H%M%S'))
@@ -72,4 +89,4 @@ def video_feed():
 
 if __name__ == '__main__':
     # 将应用程序绑定到本地主机上的IP地址为127.0.0.1，端口号为5000
-    app.run(debug=True, host='192.168.31.96', port=5000)
+    app.run(debug=True, host='192.168.254.10', port=5000)
