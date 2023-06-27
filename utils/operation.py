@@ -127,7 +127,7 @@ class YOLO(ONNXModel):
         img_in /= 255.0
         return img_in
 
-    def decect(self, file, video=False):
+    def detect(self, file, video=False):
         # 图片转换为矩阵
         image_numpy = self.to_numpy(file, shape=(self.img_size, self.img_size))
         input_feed = self.get_input_feed(self.input_name, image_numpy)

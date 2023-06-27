@@ -51,16 +51,17 @@ def detect(frame, onnx_path="data/model/best.onnx"):
     :param onnx_path: 用于检测的模型
     :return:输出帧
     """
-    # 镜像转换
-    frame = cv2.flip(frame, 1)
-
-    # 实时显示时间
-    frame = PutTime(frame)
 
     # 加载yolov5模型
     frame = np.array(frame)
     yolo = YOLO(onnx_path=onnx_path)
-    det_obj = yolo.decect(frame, video=True)
+    det_obj = yolo.detect(frame, video=True)
+
+    # 镜像转换
+    # frame = cv2.flip(frame, 1)
+
+    # 实时显示时间
+    frame = PutTime(frame)
 
     # 检测视频并标注及后续操作
     frame, is_fall = label(det_obj, frame)
